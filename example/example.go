@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/im7mortal/UTM"
+	"github.com/raiansantos/utm"
 )
 
 func main() {
-	easting, northing, zoneNumber, zoneLetter, err := UTM.FromLatLon(-28.502990, -49.01296, false)
+	easting, northing, zoneNumber, zoneLetter, err := utm.FromLatLon(-28.502990, -49.01296, false)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -15,6 +15,6 @@ func main() {
 		easting, northing, zoneNumber, zoneLetter)
 	fmt.Println(text)
 
-	latitude, longitude, err := UTM.ToLatLon(694478, 6845477, 22, "", false)
+	latitude, longitude, err := utm.ToLatLon(694478, 6845477, 22, "", false)
 	fmt.Println(fmt.Sprintf("Latitude: %.5f; Longitude: %.5f;", latitude, longitude))
 }

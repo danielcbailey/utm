@@ -1,1 +1,3 @@
-module github.com/im7mortal/UTM
+module github.com/raiansantos/utm
+
+go 1.19

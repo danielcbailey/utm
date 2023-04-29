@@ -179,8 +179,10 @@ func ValidateLatLone(latitude, longitude float64) error {
 	return nil
 }
 
-// FromLatLon convert a latitude and longitude to Universal Transverse Mercator coordinates
-func FromLatLon(latitude, longitude float64, northern bool) (easting, northing float64, zoneNumber int, zoneLetter string, err error) {
+// FromLatLonForced is a version of FromLatLon that allows you to force the zone number and zone letter
+// for scenarios where data is split across zones but the easting/northing needs to be part of the same
+// zone as the rest of the data.
+func FromLatLongForced(latitude, longitude float64, zoneNumber int) (easting, northing float64, err error) {
 	// check that latitude and longitude are valid
 	err = ValidateLatLone(latitude, longitude)
 	if err != nil {
@@ -194,19 +196,6 @@ func FromLatLon(latitude, longitude float64, northern bool) (easting, northing f
 	latTan := latSin / latCos
 	latTan2 := latTan * latTan
 	latTan4 := latTan2 * latTan2
-
-	zoneNumber = latLonToZoneNumber(latitude, longitude)
-
-	zoneLetter = latitudeToZoneLetter(latitude)
-
-	if northern {
-		// N north, S south
-		if latitude > 0 {
-			zoneLetter = "N"
-		} else {
-			zoneLetter = "S"
-		}
-	}
 
 	lonRad := rad(longitude)
 	centralLon := zoneNumberToCentralLongitude(zoneNumber)
@@ -235,6 +224,31 @@ func FromLatLon(latitude, longitude float64, northern bool) (easting, northing f
 	if latitude < 0 {
 		northing += 10000000
 	}
+
+	return
+}
+
+// FromLatLon convert a latitude and longitude to Universal Transverse Mercator coordinates
+func FromLatLon(latitude, longitude float64, northern bool) (easting, northing float64, zoneNumber int, zoneLetter string, err error) {
+	// check that latitude and longitude are valid
+	err = ValidateLatLone(latitude, longitude)
+	if err != nil {
+		return
+	}
+
+	zoneNumber = latLonToZoneNumber(latitude, longitude)
+	zoneLetter = latitudeToZoneLetter(latitude)
+
+	if northern {
+		// N north, S south
+		if latitude > 0 {
+			zoneLetter = "N"
+		} else {
+			zoneLetter = "S"
+		}
+	}
+
+	easting, northing, err = FromLatLongForced(latitude, longitude, zoneNumber)
 
 	return
 }
